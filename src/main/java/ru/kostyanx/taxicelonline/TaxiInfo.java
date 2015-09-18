@@ -13,19 +13,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import ru.kostyanx.database.JDatabaseException;
-import ru.kostyanx.database.JFirebirdDatabase;
-import ru.kostyanx.database.JH2Database;
-import ru.kostyanx.json.jco;
-import ru.kostyanx.utils.KostyanxUtil;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.kostyanx.database.JDatabaseException;
+import ru.kostyanx.database.JFirebirdDatabase;
+import ru.kostyanx.database.JH2Database;
+import ru.kostyanx.json.jco;
 import ru.kostyanx.taxi.database.JTermTypeElement;
 import ru.kostyanx.taxicelonline.data.JSONString;
 import ru.kostyanx.taxicelonline.data.TOrderMonitoring;
 import ru.kostyanx.taxicelonline.database.JEventElement;
+import ru.kostyanx.taxicelonline.database.JOrderElement;
+import ru.kostyanx.utils.KostyanxUtil;
 
 /*
  * To change this template, choose Tools | Templates
@@ -161,15 +162,17 @@ public class TaxiInfo {
     public JH2Database getIntDb() {
         return intDb;
     }
+    
+    public JFirebirdDatabase getTolDb() {
+        return tolDb;
+    }
 
     public void disconnect() {
         db.disconnect();
         intDb.disconnect();
+        tolDb.disconnect();
     }
-
-    public JFirebirdDatabase getTolDb() {
-        return tolDb;
-    }
+    
 
     public void putEvent(String session, JSONObject event) {
         JEventElement ev = new JEventElement(intDb);
@@ -249,6 +252,10 @@ public class TaxiInfo {
 
     public Properties getConfig() {
         return config;
+    }
+    
+    public void onOrderCreated(JOrderElement order) {
+        
     }
 
 

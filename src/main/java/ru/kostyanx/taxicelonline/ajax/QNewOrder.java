@@ -13,9 +13,9 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import ru.kostyanx.database.JDatabaseException;
-import ru.kostyanx.json.jco;
+import ru.kostyanx.database.JFirebirdDatabase;
+import static ru.kostyanx.json.jco.JO;
 import ru.kostyanx.json.jh;
-import ru.kostyanx.utils.KostyanxUtil;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 import ru.kostyanx.taxicelonline.TaxiInfoException;
 import ru.kostyanx.taxicelonline.data.Point;
@@ -28,6 +28,7 @@ import ru.kostyanx.taxicelonline.database.JQAddProperty;
 import ru.kostyanx.taxicelonline.database.JQDialNumber2;
 import ru.kostyanx.taxicelonline.database.JTOLClientElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
+import ru.kostyanx.utils.KostyanxUtil;
 
 /**
  *
@@ -94,14 +95,18 @@ public class QNewOrder implements JSONQuery {
 
     @Override
     public JSONObject execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        TaxiInfo ti = TaxiInfo.get();
+        JFirebirdDatabase db = ti.getDb();
+        JFirebirdDatabase tolDb = ti.getTolDb();
         synchronized(TaxiPlaceResolver.get()) {
             if (plres == null) {
                 try {
-                    TaxiPlaceResolver.get().init(TaxiInfo.get().getDb());
+                    TaxiPlaceResolver.get().init(db);
                     plres = TaxiPlaceResolver.get();
                 } catch (JDatabaseException e) {}
             }
         }
+        
         JSONObject order = jh._obj(request.getParameter("order"));
         // fields: address_src, address_dst, time, client_id, comment
         logger.info(order);
@@ -121,14 +126,13 @@ public class QNewOrder implements JSONQuery {
         YandexPoint yp = new YandexPoint(srcPoint);
         TaxiDrvPlace pl = plres.getPlace(new Point(yp.lat(), yp.lon()));
 
-        JTOLOrderElement tolorder = new JTOLOrderElement(TaxiInfo.get().getTolDb());
+        JTOLOrderElement tolorder = new JTOLOrderElement(tolDb);
         tolorder.clientId(clientId);
         tolorder.sid(sid);
         try {
             if (!nolater && u.dp(Ajax.df, time) == null) { throw new TaxiInfoException("неверные входные парамеры"); }
-            JTOLClientElement client = new JTOLClientElement(TaxiInfo.get().getTolDb())
-											.getById(clientId);
-            JOrderElement torder = new JOrderElement(TaxiInfo.get().getDb());
+            JTOLClientElement client = new JTOLClientElement(tolDb).getById(clientId);
+            JOrderElement torder = new JOrderElement(db);
             Timestamp preTime = nolater ? new Timestamp(System.currentTimeMillis() + 10 * 60 * 1000)
                         : new Timestamp(u.dp(Ajax.df, time).getTime());
             if ("airport".equals(srcKind) || "airport".equals(dstKind)) {
@@ -137,7 +141,7 @@ public class QNewOrder implements JSONQuery {
                     Float cost = jh.path(calcAirport, "data/0/day").f();
                     if (cost != null) {
                         airportComment = String.format("%1.0f", cost);
-                        Float nacenki = TaxiInfo.get().calcNacenki(u.implode(options, ","));
+                        Float nacenki = ti.calcNacenki(u.implode(options, ","));
                         if (!nacenki.equals(0.0F)) {
                             airportComment += String.format("+%1.0f", nacenki);
                         }
@@ -145,12 +149,12 @@ public class QNewOrder implements JSONQuery {
                 }
             }
 
-            torder.id(TaxiInfo.get().getDb().execute(new JQGenOrdId()))
+            torder.id(db.execute(new JQGenOrdId()))
                     .inet(true)
                     .phone(client.phone())
                     .client(client.name()+" (сайт)")
                     .address("*"+srcName).lat( rcoord(yp.lat()) ).lon( rcoord(yp.lon()) )
-                    .drvPlace(pl == null ? u.i(TaxiInfo.get().getConfig().getProperty("taxi.other_place_id")) : pl.getId())
+                    .drvPlace(pl == null ? u.i(ti.getConfig().getProperty("taxi.other_place_id")) : pl.getId())
                     .preOrder(!nolater)
                     .anyGrp(!nolater)
                     .preTime(preTime)
@@ -159,20 +163,22 @@ public class QNewOrder implements JSONQuery {
                     .appendCommentTemp("едут до: "+dstName)
                     .appendCommentTemp(nolater ? null : "сверить интернет-заказ с клиентом!");
             processOptions(torder, options);
-            torder.save();
+            torder.insert();
             tolorder.taxiId(torder.id());
             tolorder.save();
             // ставим на дозвон для соединения с оператором, если заказ предварительный
             if (!nolater) {
-                TaxiInfo.get().getDb().execute(new JQDialNumber2(0, torder.phone(), torder.id(), 0, 1));
+                db.execute(new JQDialNumber2(0, torder.phone(), torder.id(), 0, 1));
             }
+            logger.info(String.format("coord=%s, place=%s, src=%s, dst=%s, client_id=%s, sid=%s", yp, pl, srcName, dstName, clientId, sid));
+            ti.onOrderCreated(torder);
+            return JO("result", "ok", "order_id", tolorder.id());
         } catch (JDatabaseException e) {
             logger.error("ошибка при создании заказа",e);
-            return jco.cput("result", "error").put("error", "внутренняя ошибка сервера").get();
+            return JO("result", "error", "error", "внутренняя ошибка сервера");
         } catch (TaxiInfoException e) {
-            return jco.cput("result", "error").put("error", e.getMessage()).get();
+            return JO("result", "error", "error", e.getMessage());
         }
-        logger.info(String.format("coord=%s, place=%s, src=%s, dst=%s, client_id=%s, sid=%s", yp, pl, srcName, dstName, clientId, sid));
-        return jco.cput("result", "ok").put("order_id", tolorder.id()).get();
+        
     }
 }
