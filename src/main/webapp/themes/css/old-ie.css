@@ -1,0 +1,7 @@
+#content-box .inner-page-text .contacts-page-right .send, #header-box .menu a { zoom: 1; }
+table { position: relative; z-index: 1000; }
+td { z-index: 1000; }
+#top-menu-box td { position: relative; }
+#top-menu-box td .sub { left: 8px; }
+#top-menu-box td .sub ul { margin: 5px 5px 10px 12px; }
+#content-box .inner-page-text .contacts-page-left p { padding: 0px 0px 19px 0px; }
