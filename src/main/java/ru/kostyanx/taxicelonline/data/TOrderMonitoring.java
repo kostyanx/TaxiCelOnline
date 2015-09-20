@@ -11,13 +11,13 @@ import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.database.LocalResultSet;
 import ru.kostyanx.json.jco;
 import ru.kostyanx.taxi.database.JGpsElement;
-import ru.kostyanx.utils.KostyanxUtil;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 import ru.kostyanx.taxicelonline.database.JCarElement;
 import ru.kostyanx.taxicelonline.database.JCarStatElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JQGetCarReply;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
+import ru.kostyanx.utils.KostyanxUtil;
 
 /**
  *
@@ -60,6 +60,7 @@ public class TOrderMonitoring implements Runnable {
                 // если заказ сняли, то снимаем его и в БД таксионлайн
                 tolorder.state(-1);
                 tolorder.save();
+                TaxiInfo.get().onOrderCancel(order);
                 return;
             }
             switch(tolorder.state()) {

@@ -1,6 +1,6 @@
-<%@page import="taxiinfo.TaxiInfo"%>
-<%@page import="kostyanxutil.KostyanxUtil"%>
-<%@page import="taxiinfo.database.JTOLClientElement"%>
+<%@page import="ru.kostyanx.taxicelonline.TaxiInfo"%>
+<%@page import="ru.kostyanx.utils.KostyanxUtil"%>
+<%@page import="ru.kostyanx.taxicelonline.database.JTOLClientElement"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     Integer clientId = null;

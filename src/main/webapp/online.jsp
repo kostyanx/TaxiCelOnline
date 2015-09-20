@@ -3,9 +3,9 @@
     Created on : 31.08.2013, 16:44:11
     Author     : kostyanx
 --%>
-<%@page import="taxiinfo.TaxiInfo"%>
-<%@page import="taxiinfo.database.JTOLClientElement"%>
-<%@page import="kostyanxutil.KostyanxUtil"%>
+<%@page import="ru.kostyanx.taxicelonline.TaxiInfo"%>
+<%@page import="ru.kostyanx.utils.KostyanxUtil"%>
+<%@page import="ru.kostyanx.taxicelonline.database.JTOLClientElement"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     Integer clientId = null;

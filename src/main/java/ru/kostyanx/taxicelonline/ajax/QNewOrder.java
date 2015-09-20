@@ -29,6 +29,8 @@ import ru.kostyanx.taxicelonline.database.JQDialNumber2;
 import ru.kostyanx.taxicelonline.database.JTOLClientElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
 import ru.kostyanx.utils.KostyanxUtil;
+import static ru.kostyanx.utils.KostyanxUtil.dp;
+import static ru.kostyanx.utils.KostyanxUtil.implode;
 
 /**
  *
@@ -118,7 +120,7 @@ public class QNewOrder implements JSONQuery {
         String dstKind = jh.path(order, "address_src/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
         String airportComment = null;
         String comment = jh.path(order, "comment").s();
-        Boolean nolater = u.coalesce(jh.b(order, "nolater"), true);
+        Boolean nolater = jh.b(order, "nolater", true);
         String time = jh.s(order, "time");
         JSONArray options = jh._arr(order, "options");
         String sid = request.getSession(true).getId();
@@ -130,18 +132,18 @@ public class QNewOrder implements JSONQuery {
         tolorder.clientId(clientId);
         tolorder.sid(sid);
         try {
-            if (!nolater && u.dp(Ajax.df, time) == null) { throw new TaxiInfoException("неверные входные парамеры"); }
+            if (!nolater && dp(Ajax.df, time) == null) { throw new TaxiInfoException("неверные входные парамеры"); }
             JTOLClientElement client = new JTOLClientElement(tolDb).getById(clientId);
             JOrderElement torder = new JOrderElement(db);
             Timestamp preTime = nolater ? new Timestamp(System.currentTimeMillis() + 10 * 60 * 1000)
-                        : new Timestamp(u.dp(Ajax.df, time).getTime());
+                        : new Timestamp(dp(Ajax.df, time).getTime());
             if ("airport".equals(srcKind) || "airport".equals(dstKind)) {
                 JSONObject calcAirport = new QCalcTariffAirport().execute(request, response);
                 if (calcAirport != null && "ok".equals(jh.s(calcAirport, "result"))) {
                     Float cost = jh.path(calcAirport, "data/0/day").f();
                     if (cost != null) {
                         airportComment = String.format("%1.0f", cost);
-                        Float nacenki = ti.calcNacenki(u.implode(options, ","));
+                        Float nacenki = ti.calcNacenki(implode(options, ","));
                         if (!nacenki.equals(0.0F)) {
                             airportComment += String.format("+%1.0f", nacenki);
                         }

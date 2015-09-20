@@ -4,6 +4,7 @@ package ru.kostyanx.taxicelonline;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,12 @@ import ru.kostyanx.taxicelonline.data.JSONString;
 import ru.kostyanx.taxicelonline.data.TOrderMonitoring;
 import ru.kostyanx.taxicelonline.database.JEventElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
+import ru.kostyanx.taxicelonline.database.JQSendSms;
+import ru.kostyanx.utils.Config;
 import ru.kostyanx.utils.KostyanxUtil;
+import static ru.kostyanx.utils.KostyanxUtil.df;
+import static ru.kostyanx.utils.KostyanxUtil.empty2;
+import static ru.kostyanx.utils.KostyanxUtil.fillVariables;
 
 /*
  * To change this template, choose Tools | Templates
@@ -38,11 +44,12 @@ import ru.kostyanx.utils.KostyanxUtil;
  * @author kostyanx
  */
 public class TaxiInfo {
-
+    public static final SimpleDateFormat tf = new SimpleDateFormat("mm:ss");
     /* вспомогательные функции */
     static {
         PropertyConfigurator.configure(TaxiInfo.class.getResource("/log4j.properties"));
     }
+
     private static class Holder {
         public static final TaxiInfo instance = new TaxiInfo();
     }
@@ -254,9 +261,41 @@ public class TaxiInfo {
         return config;
     }
     
+    private void sendMessage(String phone, String text) {
+        try {
+            db.execute(new JQSendSms(phone, text));
+        } catch (JDatabaseException e) {
+            logger.error("can't send sms to client", e);
+        }
+    }
+    
+    private void sendOrderMessage(JOrderElement order, String template) {
+        Config variables = Config.as(
+                "client", order.client(),
+                "address", order.address(),
+                "pretime", df(tf, order.preTime()));
+        String message = fillVariables(template, variables, false);
+        sendMessage(order.phone(), message);
+    }
+    
+    private void msgOnCreate(JOrderElement order) {
+        String template = order.preOrder() ? config.getProperty("taxi.messages.on_create_pre") : config.getProperty("taxi.messages.on_create_curr");
+        if (empty2(template)) { return; }
+        sendOrderMessage(order, template);
+    }
+    
+    private void msgOnCancel(JOrderElement order) {
+        String template = config.getProperty("taxi.messages.on_cancel");
+        if (empty2(template)) { return; }
+        sendOrderMessage(order, template);
+    }
+    
     public void onOrderCreated(JOrderElement order) {
-        
+        msgOnCreate(order);
     }
 
+    public void onOrderCancel(JOrderElement order) {
+        msgOnCancel(order);
+    }
 
 }
