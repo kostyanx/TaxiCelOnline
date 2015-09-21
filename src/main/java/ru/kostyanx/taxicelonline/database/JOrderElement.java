@@ -29,7 +29,7 @@ public class JOrderElement extends JDatabaseRecord2<JOrderElement> {
 			"ORDCLIENT", "ORDPRETYPE", "ORDPRETIME", "ORDCARID", "ORDDRVID", "ORDCARPLID",
 			"ORDPLACE", "ORDDRVTERMID", "ORDTERMTIME", "ORDWANCARID", "ORDANYGRP",
 			"ORDINET", "ORDCOMMENT", "ORDLATITUDE", "ORDLONGITUDE", "ORDCHAN",
-			"ORDREACHTIME", "ORDAMNT"};
+			"ORDREACHTIME", "ORDAMNT", "ORDOPID", "ORDOPID2"};
 		return cols;
 	}
 
@@ -294,6 +294,24 @@ public class JOrderElement extends JDatabaseRecord2<JOrderElement> {
 
     public JOrderElement amount(Float lat) {
         set("ORDAMNT", lat);
+        return this;
+    }
+    
+    public Integer opId() {
+        return rs.getInt("ORDOPID");
+    }
+    
+    public JOrderElement opId(Integer opId) {
+        set("ORDOPID", opId);
+        return this;
+    }
+    
+    public Integer opId2() {
+        return rs.getInt("ORDOPID2");
+    }
+    
+    public JOrderElement opId2(Integer opId2) {
+        set("ORDOPID2", opId2);
         return this;
     }
 

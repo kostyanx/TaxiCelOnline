@@ -38,6 +38,7 @@ public class QRequestCode implements JSONQuery{
             client.phone(phone);
             client.confirmed(false);
             client.name(name);
+            client.code(TaxiInfo.get().genCode(3));
             client.save(ti.getTolDb());
             ti.getDb().execute(new JQSendSms(phone, String.format("Код подтверждения: %s", client.code())));
         } catch (JDatabaseException e) {

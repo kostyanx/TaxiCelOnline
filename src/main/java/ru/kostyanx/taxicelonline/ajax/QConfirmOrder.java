@@ -7,6 +7,7 @@ package ru.kostyanx.taxicelonline.ajax;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -15,13 +16,15 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.json.jco;
-import ru.kostyanx.utils.KostyanxUtil;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 import ru.kostyanx.taxicelonline.TaxiInfoException;
 import ru.kostyanx.taxicelonline.data.TOrderMonitoring;
 import ru.kostyanx.taxicelonline.database.JCarElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
+import ru.kostyanx.utils.KostyanxUtil;
+import static ru.kostyanx.utils.KostyanxUtil.digits;
+import static ru.kostyanx.utils.KostyanxUtil.i;
 
 /**
  *
@@ -33,6 +36,7 @@ public class QConfirmOrder implements JSONQuery {
 
     @Override
     public JSONObject execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Properties cfg = TaxiInfo.get().getConfig();
         Integer orderId = u.i(request.getParameter("order_id"));
         String sid = request.getSession(true).getId();
         Integer clientId = null;
@@ -68,10 +72,13 @@ public class QConfirmOrder implements JSONQuery {
                 }
                 tolorder.getRs().nextrow();
             }
+            Integer operatorId = i(cfg.getProperty("taxi.user_id"));
             JOrderElement order = new JOrderElement(TaxiInfo.get().getDb());
-            order.getById(tolorder.taxiId());
-            order.termId(1).termTime(new Timestamp(System.currentTimeMillis()));
-            order.save(TaxiInfo.get().getDb());
+            order.getById(tolorder.taxiId())
+                    .termId(1)
+                    .opId2(operatorId)
+                    .termTime(new Timestamp(System.currentTimeMillis()))
+                    .save();
             tolorder.state(3);
             tolorder.save(TaxiInfo.get().getTolDb());
             JCarElement car = new JCarElement(TaxiInfo.get().getDb());
@@ -80,7 +87,7 @@ public class QConfirmOrder implements JSONQuery {
             carInfo = new JSONObject();
             carInfo.put("mark", car.mark());
             carInfo.put("color", car.color());
-            carInfo.put("number", u.digits(car.gosNum()));
+            carInfo.put("number", digits(car.gosNum()));
             carInfo.put("time", String.format("%tR", new Date(order.termTime().getTime()+time * 1000)));
             TOrderMonitoring.sendTrackEvent(tolorder, order, true);
         } catch (JDatabaseException e) {

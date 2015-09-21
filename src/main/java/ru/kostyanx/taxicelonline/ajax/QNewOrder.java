@@ -6,6 +6,7 @@ package ru.kostyanx.taxicelonline.ajax;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,9 @@ import ru.kostyanx.taxicelonline.database.JTOLClientElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
 import ru.kostyanx.utils.KostyanxUtil;
 import static ru.kostyanx.utils.KostyanxUtil.dp;
+import static ru.kostyanx.utils.KostyanxUtil.empty2;
+import static ru.kostyanx.utils.KostyanxUtil.fmt;
+import static ru.kostyanx.utils.KostyanxUtil.i;
 import static ru.kostyanx.utils.KostyanxUtil.implode;
 
 /**
@@ -100,6 +104,7 @@ public class QNewOrder implements JSONQuery {
         TaxiInfo ti = TaxiInfo.get();
         JFirebirdDatabase db = ti.getDb();
         JFirebirdDatabase tolDb = ti.getTolDb();
+        Properties cfg = ti.getConfig();
         synchronized(TaxiPlaceResolver.get()) {
             if (plres == null) {
                 try {
@@ -113,8 +118,15 @@ public class QNewOrder implements JSONQuery {
         // fields: address_src, address_dst, time, client_id, comment
         logger.info(order);
         String srcPoint = jh.path(order, "address_src/GeoObject/Point/pos").s();
-        String dstPoint = jh.path(order, "address_dst/GeoObject/Point/pos").s();
+//        String dstPoint = jh.path(order, "address_dst/GeoObject/Point/pos").s();
         String srcName = jh.path(order, "address_src/GeoObject/name").s();
+        String premiseNumber = jh.search(order, "PremiseNumber").s();
+        if (!empty2(premiseNumber)) {
+            String thoroughfareName = jh.search(order, "ThoroughfareName").s();
+            srcName = fmt("%s %s-", thoroughfareName, premiseNumber);
+        } else {
+            srcName = "*"+srcName;
+        }
         String dstName = jh.path(order, "address_dst/GeoObject/name").s();
         String srcKind = jh.path(order, "address_src/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
         String dstKind = jh.path(order, "address_src/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
@@ -150,16 +162,17 @@ public class QNewOrder implements JSONQuery {
                     }
                 }
             }
-
+            Integer operatorId = i(cfg.getProperty("taxi.user_id"));
             torder.id(db.execute(new JQGenOrdId()))
                     .inet(true)
                     .phone(client.phone())
                     .client(client.name()+" (сайт)")
-                    .address("*"+srcName).lat( rcoord(yp.lat()) ).lon( rcoord(yp.lon()) )
+                    .address(srcName).lat( rcoord(yp.lat()) ).lon( rcoord(yp.lon()) )
                     .drvPlace(pl == null ? u.i(ti.getConfig().getProperty("taxi.other_place_id")) : pl.getId())
                     .preOrder(!nolater)
                     .anyGrp(!nolater)
                     .preTime(preTime)
+                    .opId(operatorId)
                     .appendCommentTemp(airportComment)
                     .appendCommentTemp(comment)
                     .appendCommentTemp("едут до: "+dstName)
