@@ -14,9 +14,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.json.jco;
-import org.apache.log4j.Logger;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 /**
  *
@@ -46,6 +46,7 @@ public class Ajax extends HttpServlet {
         queries.put("confirm_phone", new QConfirmPhone());
         queries.put("call_on_assign", new QCallOnAssign());
 		queries.put("bumerang", new QBumerang());
+        queries.put("get_info", new QGetInfo());
         try { TaxiInfo.get().loadTermTypes(); } catch (JDatabaseException e) {}
     }
 
