@@ -76,7 +76,7 @@ public class TaxiInfo {
     private TaxiInfo() {
         try {
             config.load(new InputStreamReader(TaxiInfo.class.getResourceAsStream("/config.properties"), "UTF-8"));
-            config.load(new InputStreamReader(new FileInputStream("/etc/taxi/taxiinfo.properties"), "UTF-8"));
+            config.load(new InputStreamReader(new FileInputStream("/etc/taxi/taxicelonline.properties"), "UTF-8"));
         } catch (IOException e) {}
 
         String host = config.getProperty("database.taxi.host");

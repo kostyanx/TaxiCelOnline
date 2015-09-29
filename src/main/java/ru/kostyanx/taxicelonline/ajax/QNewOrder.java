@@ -23,6 +23,7 @@ import ru.kostyanx.taxicelonline.data.Point;
 import ru.kostyanx.taxicelonline.data.TaxiDrvPlace;
 import ru.kostyanx.taxicelonline.data.TaxiPlaceResolver;
 import ru.kostyanx.taxicelonline.data.YandexPoint;
+import ru.kostyanx.taxicelonline.database.JCarElement;
 import ru.kostyanx.taxicelonline.database.JCarPropElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JQAddProperty;
@@ -41,6 +42,14 @@ import static ru.kostyanx.utils.KostyanxUtil.implode;
  * @author kostyanx
  */
 public class QNewOrder implements JSONQuery {
+    public static final String G_COMF = "С-кл";
+    public static final String G_UNIV = "Унив.";
+    public static final String G_MINIV = "Минив";
+    public static final String G_MA = "м/а";
+    public static final String P_TABLE = "Встреча с табличкой";
+    public static final String P_CHILD = "Детское кресло";
+//    public static final String P_SKIS = "";
+    public static final String P_ANIMALS = "Перевозка животных";
     private TaxiPlaceResolver plres = null;
     private Logger logger = Logger.getLogger(QNewOrder.class);
     private KostyanxUtil u = KostyanxUtil.get();
@@ -54,42 +63,57 @@ public class QNewOrder implements JSONQuery {
     }
 
     private void addProperty(JOrderElement order, String name) throws JDatabaseException {
+        TaxiInfo ti = TaxiInfo.get();
+        if (!"yes".equals(ti.getConfig().getProperty("taxi.use_properties"))) { return; }
         JCarPropElement carprop;
-        carprop = new JCarPropElement(TaxiInfo.get().getDb());
+        carprop = new JCarPropElement(ti.getDb());
         carprop.getWhere("CPNAME = ?", name);
         if (carprop.getRs().size() > 0) {
             carprop.getRs().nextrow();
             TaxiInfo.get().getDb().execute(new JQAddProperty(order.id(), carprop.id()));
         }
     }
+    
+    private void setGroup(JOrderElement order, String groupName) throws JDatabaseException {
+        JCarElement group = new JCarElement(TaxiInfo.get().getDb())
+                .getWhereSF("CARCALLID = ? and DELETED = ? and CARISGRP = ?", groupName, "0", "1");
+        order.group(group.id());
+    }
 
     private void processOption(JOrderElement order, String option, JSONArray options) throws JDatabaseException {
-
+        
         switch(option) {
+            case "comfort":
+                setGroup(order, G_COMF);
             case "universal":
-                order.appendCommentTemp("УНИВЕРСАЛ (+200)");
-                addProperty(order, "универсал");
+                setGroup(order, G_UNIV);
                 break;
             case "miniven":
-                order.appendCommentTemp("МИНИВЕН (+400)");
-                addProperty(order, "минивен");
+                setGroup(order, G_MINIV);
+                break;
+            case "ma":
+                setGroup(order, G_MA);
+                break;
+            case "childchair":
+                addProperty(order, P_CHILD);
                 break;
             case "zhivotnie":
-                order.appendCommentTemp("ЖИВОТНЫЕ (+200)");
+                addProperty(order, P_ANIMALS);
                 break;
             case "lyzhi":
-                if (!options.contains("universal")) {
-                    order.appendCommentTemp("ЛЫЖИ (+150)");
-                }
+//                if (!options.contains("universal")) {
+//                    order.appendCommentTemp("ЛЫЖИ (+150)");
+//                }
                 break;
             case "airport":
-                order.appendCommentTemp("ВСТРЕЧА В АЭРОПОРТУ (+100)");
+//                order.appendCommentTemp("ВСТРЕЧА В АЭРОПОРТУ (+100)");
                 break;
             case "tablichka":
-                order.appendCommentTemp("ВСТРЕЧА С ТАБЛИЧКОЙ (+100)");
+                addProperty(order, P_TABLE);
+//                order.appendCommentTemp("ВСТРЕЧА С ТАБЛИЧКОЙ (+100)");
                 break;
             default:
-                order.appendCommentTemp(option);
+//                order.appendCommentTemp(option);
                 logger.warn("нет обработчика для опции"+option);
                 break;
         }
