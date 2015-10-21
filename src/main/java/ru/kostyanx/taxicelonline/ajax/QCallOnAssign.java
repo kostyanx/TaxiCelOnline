@@ -12,26 +12,26 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.json.jco;
-import ru.kostyanx.utils.KostyanxUtil;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 import ru.kostyanx.taxicelonline.TaxiInfoException;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
+import ru.kostyanx.utils.K;
 
 /**
  *
  * @author kostyanx
  */
 public class QCallOnAssign implements JSONQuery {
-    private KostyanxUtil u = KostyanxUtil.get();
+    
     @Override
     public JSONObject execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Integer orderId = u.i(request.getParameter("order_id"));
+        Integer orderId = K.i(request.getParameter("order_id"));
         String sid = request.getSession(true).getId();
         Integer clientId = null;
         for(Cookie c : request.getCookies()) {
             if ("client_id".equals(c.getName())) {
-                clientId = u.i(c.getValue());
+                clientId = K.i(c.getValue());
             }
         }
         try {

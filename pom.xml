@@ -4,7 +4,7 @@
 
     <groupId>ru.kostyanx</groupId>
     <artifactId>TaxiCelOnline</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>war</packaging>
 
     <name>TaxiCelOnline</name>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>ru.kostyanx</groupId>
             <artifactId>kostyanx-utils</artifactId>
-            <version>1.0.8</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 

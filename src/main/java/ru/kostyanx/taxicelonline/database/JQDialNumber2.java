@@ -6,14 +6,13 @@ package ru.kostyanx.taxicelonline.database;
 
 import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.database.JDatabaseQuery;
-import ru.kostyanx.utils.KostyanxUtil;
+import ru.kostyanx.utils.K;
 
 /**
  *
  * @author kostyanx
  */
 public class JQDialNumber2 extends JDatabaseQuery<Object> {
-    private static KostyanxUtil u = KostyanxUtil.get();
     private Integer line;
     private String phone;
     private Integer orderId;
@@ -31,7 +30,7 @@ public class JQDialNumber2 extends JDatabaseQuery<Object> {
     @Override
     public Object execute() throws JDatabaseException {
         String sql = "execute procedure DIALNUMBER2(?, ?, ?, ?, ?)";
-        database.executeUpdateInt(sql, line, phone, orderId, u.s(state), u.s(operation));
+        database.executeUpdateInt(sql, line, phone, orderId, K.s(state), K.s(operation));
         return null;
     }
     

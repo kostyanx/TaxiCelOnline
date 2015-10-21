@@ -7,6 +7,7 @@ package ru.kostyanx.taxicelonline.database;
 import java.sql.Timestamp;
 import ru.kostyanx.database.JDatabaseAbstract;
 import ru.kostyanx.database.JDatabaseRecord2;
+import ru.kostyanx.utils.K;
 
 /**
  *
@@ -207,7 +208,7 @@ public class JOrderElement extends JDatabaseRecord2<JOrderElement> {
         if (oldComment != null && oldComment.contains("|")) {
             String[] commentArr = oldComment.split("\\|");
             commentArr[0] = comment;
-            set("ORDCOMMENT", u.implode(commentArr, "|"));
+            set("ORDCOMMENT", K.implode(commentArr, "|"));
         } else {
             set("ORDCOMMENT", comment);
         }
@@ -227,9 +228,9 @@ public class JOrderElement extends JDatabaseRecord2<JOrderElement> {
         if (oldComment != null && oldComment.contains("|")) {
             String[] commentArr = oldComment.split("\\|");
             commentArr[1] = comment;
-            set("ORDCOMMENT", u.implode(commentArr, "|"));
+            set("ORDCOMMENT", K.implode(commentArr, "|"));
         } else {
-            set("ORDCOMMENT", u.coalesce(oldComment, "")+"|"+comment);
+            set("ORDCOMMENT", K.coalesce(oldComment, "")+"|"+comment);
         }
         return this;
     }

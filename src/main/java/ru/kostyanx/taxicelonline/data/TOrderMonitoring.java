@@ -17,15 +17,14 @@ import ru.kostyanx.taxicelonline.database.JCarStatElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JQGetCarReply;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
-import ru.kostyanx.utils.KostyanxUtil;
+import ru.kostyanx.utils.K;
 
 /**
  *
  * @author kostyanx
  */
 public class TOrderMonitoring implements Runnable {
-    private static Logger logger = Logger.getLogger(TOrderMonitoring.class);
-    private static KostyanxUtil u = KostyanxUtil.get();
+    private static final Logger logger = Logger.getLogger(TOrderMonitoring.class);
 
     @Override
     public synchronized void run() {
@@ -94,7 +93,7 @@ public class TOrderMonitoring implements Runnable {
             if (timeInfo.getInt("CARTIME") != null) {
                 return timeInfo.getInt("CARTIME");
             } else if (timeInfo.getString("CARANSWER") != null) {
-                Integer minutes = u.i(u.digits(timeInfo.getString("CARANSWER")), 25);
+                Integer minutes = K.i(K.digits(timeInfo.getString("CARANSWER")), 25);
                 return minutes * 60;
             }
         }

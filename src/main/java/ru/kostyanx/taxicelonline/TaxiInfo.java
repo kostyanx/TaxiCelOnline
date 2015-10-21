@@ -29,7 +29,7 @@ import ru.kostyanx.taxicelonline.database.JEventElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JQSendSms;
 import ru.kostyanx.utils.Config;
-import ru.kostyanx.utils.KostyanxUtil;
+import ru.kostyanx.utils.K;
 import static ru.kostyanx.utils.KostyanxUtil.df;
 import static ru.kostyanx.utils.KostyanxUtil.empty2;
 import static ru.kostyanx.utils.KostyanxUtil.fillVariables;
@@ -64,7 +64,6 @@ public class TaxiInfo {
     private JFirebirdDatabase tolDb;
     private JH2Database intDb;
     private Properties config = new Properties();
-    private KostyanxUtil u = KostyanxUtil.get();
     private Logger logger = Logger.getLogger(TaxiInfo.class);
     private ConcurrentHashMap<String, ConcurrentLinkedQueue<JSONObject>> eventQueue = new ConcurrentHashMap<>();
     private ScheduledThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(3);
@@ -80,7 +79,7 @@ public class TaxiInfo {
         } catch (IOException e) {}
 
         String host = config.getProperty("database.taxi.host");
-        Integer port = u.i(config.getProperty("database.taxi.port"), 3050);
+        Integer port = K.i(config.getProperty("database.taxi.port"), 3050);
         String username = config.getProperty("database.taxi.username");
         String password = config.getProperty("database.taxi.password");
         String dbname = config.getProperty("database.taxi.dbname");
@@ -88,7 +87,7 @@ public class TaxiInfo {
         db.setQueryLimit(100);
 
         host = config.getProperty("database.tol.host");
-        port = u.i(config.getProperty("database.tol.port"), 3050);
+        port = K.i(config.getProperty("database.tol.port"), 3050);
         username = config.getProperty("database.tol.username");
         password = config.getProperty("database.tol.password");
         dbname = config.getProperty("database.tol.dbname");
@@ -245,8 +244,7 @@ public class TaxiInfo {
     }
 
     public void loadTermTypes() throws JDatabaseException {
-        JTermTypeElement tt = new JTermTypeElement();
-        tt.getAll(TaxiInfo.get().getDb());
+        JTermTypeElement tt = new JTermTypeElement(TaxiInfo.get().getDb()).getAll();
         while(tt.getRs().nextrow()) {
             termIsOk.put(tt.id(), tt.isOk());
         }

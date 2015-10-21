@@ -18,10 +18,11 @@ import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.database.LocalResultSet;
 import ru.kostyanx.json.jca;
 import ru.kostyanx.json.jco;
-import ru.kostyanx.utils.KostyanxUtil;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 import ru.kostyanx.taxicelonline.database.JQGetOpenSmens;
 import ru.kostyanx.taxicelonline.database.JQGetOperatorsMap;
+import ru.kostyanx.utils.K;
+import static ru.kostyanx.utils.KostyanxUtil.coalesce;
 
 /**
  *
@@ -29,13 +30,12 @@ import ru.kostyanx.taxicelonline.database.JQGetOperatorsMap;
  */
 public class QOperators implements JSONQuery {
     private static Logger logger = Logger.getLogger(QOperators.class);
-    private KostyanxUtil u = KostyanxUtil.get();
     private TaxiInfo ti = TaxiInfo.get();
 
     @Override
     public JSONObject execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Date from = u.dp(Ajax.df, request.getParameter("from"));
-        Date to = u.dp(Ajax.df, request.getParameter("to"));
+        Date from = K.dp(Ajax.df, request.getParameter("from"));
+        Date to = K.dp(Ajax.df, request.getParameter("to"));
         if (from == null || to == null) {
             return jco.cput("error", 1).put("error_text", "invalid input parameters").get();
         }
@@ -57,7 +57,7 @@ public class QOperators implements JSONQuery {
                 opId = rs.getInt("ORDOPID");
                 operator = operators.get(opId);
                 smen = smens.get(opId);
-                result.add(jca.cadd(operator).add(rs.getInt("ORDTOTAL")).add(rs.getInt("ORDSUCCESS")).add(u.coalesce(smen, 0)).get());
+                result.add(jca.cadd(operator).add(rs.getInt("ORDTOTAL")).add(rs.getInt("ORDSUCCESS")).add(coalesce(smen, 0)).get());
             }
             return jco.cput("result", "ok").put("data", result).get();
         } catch (JDatabaseException e) {

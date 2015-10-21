@@ -30,7 +30,7 @@ import ru.kostyanx.taxicelonline.database.JQAddProperty;
 import ru.kostyanx.taxicelonline.database.JQDialNumber2;
 import ru.kostyanx.taxicelonline.database.JTOLClientElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
-import ru.kostyanx.utils.KostyanxUtil;
+import ru.kostyanx.utils.K;
 import static ru.kostyanx.utils.KostyanxUtil.dp;
 import static ru.kostyanx.utils.KostyanxUtil.empty2;
 import static ru.kostyanx.utils.KostyanxUtil.fmt;
@@ -52,7 +52,6 @@ public class QNewOrder implements JSONQuery {
     public static final String P_ANIMALS = "Перевозка животных";
     private TaxiPlaceResolver plres = null;
     private Logger logger = Logger.getLogger(QNewOrder.class);
-    private KostyanxUtil u = KostyanxUtil.get();
 
     private void processOptions(JOrderElement order, JSONArray options) throws JDatabaseException {
         if (options == null) { return; }
@@ -192,7 +191,7 @@ public class QNewOrder implements JSONQuery {
                     .phone(client.phone())
                     .client(client.name()+" (сайт)")
                     .address(srcName).lat( rcoord(yp.lat()) ).lon( rcoord(yp.lon()) )
-                    .drvPlace(pl == null ? u.i(ti.getConfig().getProperty("taxi.other_place_id")) : pl.getId())
+                    .drvPlace(pl == null ? K.i(ti.getConfig().getProperty("taxi.other_place_id")) : pl.getId())
                     .preOrder(!nolater)
                     .anyGrp(!nolater)
                     .preTime(preTime)

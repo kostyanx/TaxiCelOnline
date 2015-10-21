@@ -8,13 +8,12 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import ru.kostyanx.database.JDatabaseException;
-import ru.kostyanx.json.jco;
-import ru.kostyanx.json.jh;
-import ru.kostyanx.utils.KostyanxUtil;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.kostyanx.database.JDatabaseException;
+import ru.kostyanx.json.jco;
+import ru.kostyanx.json.jh;
 import ru.kostyanx.taxi.database.JConstElement;
 import ru.kostyanx.taxicelonline.TaxiInfo;
 import ru.kostyanx.taxicelonline.data.Point;
@@ -29,15 +28,14 @@ import ru.kostyanx.taxicelonline.database.JTOLAirportElement;
  */
 public class QCalcTariffAirport implements JSONQuery {
     private static Logger logger = Logger.getLogger(QCalcTariffAirport.class);
-    private KostyanxUtil u = KostyanxUtil.get();
     private TaxiPlaceResolver plres = null;
 
     public QCalcTariffAirport() {
     }
 
     private String getConst(String name) throws JDatabaseException {
-        JConstElement c = new JConstElement();
-        c.getWhere(TaxiInfo.get().getDb(), "CNAME = ? and CCHAN = ?", name, "");
+        JConstElement c = new JConstElement(TaxiInfo.get().getDb());
+        c.getWhere("CNAME = ? and CCHAN = ?", name, "");
         if (c.getRs().size() > 0) {
             c.getRs().nextrow();
             return c.value();

@@ -22,7 +22,7 @@ import ru.kostyanx.taxicelonline.data.TOrderMonitoring;
 import ru.kostyanx.taxicelonline.database.JCarElement;
 import ru.kostyanx.taxicelonline.database.JOrderElement;
 import ru.kostyanx.taxicelonline.database.JTOLOrderElement;
-import ru.kostyanx.utils.KostyanxUtil;
+import ru.kostyanx.utils.K;
 import static ru.kostyanx.utils.KostyanxUtil.digits;
 import static ru.kostyanx.utils.KostyanxUtil.i;
 
@@ -31,18 +31,17 @@ import static ru.kostyanx.utils.KostyanxUtil.i;
  * @author kostyanx
  */
 public class QConfirmOrder implements JSONQuery {
-    private static Logger logger = Logger.getLogger(QConfirmOrder.class);
-    private KostyanxUtil u = KostyanxUtil.get();
+    private static final Logger logger = Logger.getLogger(QConfirmOrder.class);
 
     @Override
     public JSONObject execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Properties cfg = TaxiInfo.get().getConfig();
-        Integer orderId = u.i(request.getParameter("order_id"));
+        Integer orderId = K.i(request.getParameter("order_id"));
         String sid = request.getSession(true).getId();
         Integer clientId = null;
         for(Cookie c : request.getCookies()) {
             if ("client_id".equals(c.getName())) {
-                clientId = u.i(c.getValue());
+                clientId = K.i(c.getValue());
             }
         }
         JSONObject carInfo = null;

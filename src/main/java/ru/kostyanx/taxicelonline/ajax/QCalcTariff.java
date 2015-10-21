@@ -8,28 +8,27 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import ru.kostyanx.database.JDatabaseException;
-import ru.kostyanx.json.jco;
-import ru.kostyanx.utils.KostyanxUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.kostyanx.database.JDatabaseException;
+import ru.kostyanx.json.jco;
 import ru.kostyanx.taxi.database.JConstElement;
 import ru.kostyanx.taxi.database.JTariffElement;
 import ru.kostyanx.taxicelonline.TaxiInfo;
+import ru.kostyanx.utils.K;
 
 /**
  *
  * @author kostyanx
  */
 public class QCalcTariff implements JSONQuery {
-    private KostyanxUtil u = KostyanxUtil.get();
 
     public QCalcTariff() {
     }
 
     private String getConst(String name) throws JDatabaseException {
-        JConstElement c = new JConstElement();
-        c.getWhere(TaxiInfo.get().getDb(), "CNAME = ? and CCHAN = ?", name, "");
+        JConstElement c = new JConstElement(TaxiInfo.get().getDb());
+        c.getWhere("CNAME = ? and CCHAN = ?", name, "");
         if (c.getRs().size() > 0) {
             c.getRs().nextrow();
             return c.value();
@@ -40,17 +39,17 @@ public class QCalcTariff implements JSONQuery {
     @Override
     public JSONObject execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray res = new JSONArray();
-        Float dist = u.f(request.getParameter("dist"));
-        Float time = u.f(request.getParameter("time"));
-        Float jamsTime = u.f(request.getParameter("jamstime"));
+        Float dist = K.f(request.getParameter("dist"));
+        Float time = K.f(request.getParameter("time"));
+        Float jamsTime = K.f(request.getParameter("jamstime"));
         String options = request.getParameter("options");
         if (dist == null || time == null || jamsTime == null) {
             return jco.cput("result", "error").put("error", "invalid input parameters").get();
         }
         Float nacenka = TaxiInfo.get().calcNacenki(options);
         try {
-            JTariffElement tariff = new JTariffElement();
-            tariff.getWhere(TaxiInfo.get().getDb(), "TFCHAN = ? and TFACTIVE = ?", "1", "1");
+            JTariffElement tariff = new JTariffElement(TaxiInfo.get().getDb());
+            tariff.getWhere("TFCHAN = ? and TFACTIVE = ?", "1", "1");
             while(tariff.getRs().nextrow()) {
                 if (tariff.up().equals(0F)) { continue; }
                 if (tariff.daynight()) {
@@ -72,7 +71,8 @@ public class QCalcTariff implements JSONQuery {
     }
 
     private Float calcCost(float up, float km, float stay, float dist, float time, float jamstTme) {
-        return up + (dist / 1000.0F * km * 1.15F) + (float)((jamstTme - time) / 3600.0 * stay);
+//        return up + (dist / 1000.0F * km * 1.15F) + (float)((jamstTme - time) / 3600.0 * stay);
+        return up + (dist / 1000.0F * km ) + (float)((jamstTme - time) / 3600.0 * stay);
     }
 
 }

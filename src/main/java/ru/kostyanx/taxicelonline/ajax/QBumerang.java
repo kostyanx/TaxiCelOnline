@@ -9,27 +9,26 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import ru.kostyanx.database.JDatabaseException;
-import static ru.kostyanx.json.jco.JO;
-import ru.kostyanx.utils.KostyanxUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.kostyanx.database.JDatabaseException;
+import static ru.kostyanx.json.jco.JO;
 import ru.kostyanx.taxi.database.JConstElement;
 import ru.kostyanx.taxicelonline.TaxiInfo;
+import ru.kostyanx.utils.K;
 
 /**
  *
  * @author kostyanx
  */
 public class QBumerang implements JSONQuery {
-    private KostyanxUtil u = KostyanxUtil.get();
 
     public QBumerang() {
     }
 
     private String getConst(String name) throws JDatabaseException {
-        JConstElement c = new JConstElement();
-        c.getWhere(TaxiInfo.get().getDb(), "CNAME = ? and CCHAN = ?", name, "");
+        JConstElement c = new JConstElement(TaxiInfo.get().getDb());
+        c.getWhere("CNAME = ? and CCHAN = ?", name, "");
         if (c.getRs().size() > 0) {
             c.getRs().nextrow();
             return c.value();
@@ -42,7 +41,7 @@ public class QBumerang implements JSONQuery {
         JSONArray res = new JSONArray();
         String phone = request.getParameter("phone");
 		if (phone == null) { return JO("result", "error"); }
-		phone = KostyanxUtil.get().digits(phone);
+		phone = K.digits(phone);
 		if (phone.length() > 10) { phone = phone.substring(phone.length() - 10, phone.length()); }
 		String taxiPhone = "8"+phone;
 		runProgram("bumerang", taxiPhone, "1");
