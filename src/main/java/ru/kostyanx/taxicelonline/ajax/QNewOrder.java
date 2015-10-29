@@ -198,7 +198,7 @@ public class QNewOrder implements JSONQuery {
                     .opId(operatorId)
                     .appendCommentTemp(airportComment)
                     .appendCommentTemp(comment)
-                    .appendCommentTemp("едут до: "+dstName)
+                    .appendCommentTemp("Поедем: "+dstName+"; Телефон:"+client.phone()+";")
                     .appendCommentTemp(nolater ? null : "сверить интернет-заказ с клиентом!");
             processOptions(torder, options);
             torder.insert();

@@ -86,6 +86,8 @@ public class QCalcTariffAirport implements JSONQuery {
         }
         String yaSrc = getAirPortZone(srcName, srcPl);
         String yaDst = getAirPortZone(dstName, dstPl);
+        logger.info(yaSrc);
+        logger.info(yaDst);
         if (yaSrc == null || yaDst == null) {
             return jco.cput("result", "error").put("error", "не удалось определить зону для одного из адресов").get();
         }
