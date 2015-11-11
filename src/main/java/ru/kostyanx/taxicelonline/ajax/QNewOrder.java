@@ -152,7 +152,7 @@ public class QNewOrder implements JSONQuery {
         }
         String dstName = jh.path(order, "address_dst/GeoObject/name").s();
         String srcKind = jh.path(order, "address_src/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
-        String dstKind = jh.path(order, "address_src/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
+        String dstKind = jh.path(order, "address_dst/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
         String airportComment = null;
         String comment = jh.path(order, "comment").s();
         Boolean nolater = jh.b(order, "nolater", true);
@@ -185,6 +185,8 @@ public class QNewOrder implements JSONQuery {
                     }
                 }
             }
+            logger.info(srcName);
+            logger.info(preTime);
             Integer operatorId = i(cfg.getProperty("taxi.user_id"));
             torder.id(db.execute(new JQGenOrdId()))
                     .inet(true)
@@ -198,16 +200,16 @@ public class QNewOrder implements JSONQuery {
                     .opId(operatorId)
                     .appendCommentTemp(airportComment)
                     .appendCommentTemp(comment)
-                    .appendCommentTemp("Поедем: "+dstName+"; Телефон:"+client.phone()+";")
-                    .appendCommentTemp(nolater ? null : "сверить интернет-заказ с клиентом!");
+                    .appendCommentTemp("Поедем: "+dstName+"; Телефон:"+client.phone()+";");
+                    //.appendCommentTemp(nolater ? null : "сверить интернет-заказ с клиентом!");
             processOptions(torder, options);
             torder.insert();
             tolorder.taxiId(torder.id());
             tolorder.save();
             // ставим на дозвон для соединения с оператором, если заказ предварительный
-            if (!nolater) {
+            /*if (!nolater) {
                 db.execute(new JQDialNumber2(0, torder.phone(), torder.id(), 0, 1));
-            }
+            } */
             logger.info(String.format("coord=%s, place=%s, src=%s, dst=%s, client_id=%s, sid=%s", yp, pl, srcName, dstName, clientId, sid));
             ti.onOrderCreated(torder);
             return JO("result", "ok", "order_id", tolorder.id());
