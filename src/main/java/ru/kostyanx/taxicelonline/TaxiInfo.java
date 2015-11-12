@@ -44,7 +44,7 @@ import static ru.kostyanx.utils.KostyanxUtil.fillVariables;
  * @author kostyanx
  */
 public class TaxiInfo {
-    public static final SimpleDateFormat tf = new SimpleDateFormat("mm:ss");
+    public static final SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
     /* вспомогательные функции */
     static {
         PropertyConfigurator.configure(TaxiInfo.class.getResource("/log4j.properties"));
