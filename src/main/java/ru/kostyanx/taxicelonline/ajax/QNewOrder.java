@@ -143,13 +143,17 @@ public class QNewOrder implements JSONQuery {
         String srcPoint = jh.path(order, "address_src/GeoObject/Point/pos").s();
 //        String dstPoint = jh.path(order, "address_dst/GeoObject/Point/pos").s();
         String srcName = jh.path(order, "address_src/GeoObject/name").s();
-        String premiseNumber = jh.search(order, "PremiseNumber").s();
+        String srcJson = jh.path(order, "address_src").s();
+//        logger.info(srcJson);
+//        logger.info(srcName);
+        String premiseNumber = jh.search(srcJson, "PremiseNumber").s();
         if (!empty2(premiseNumber)) {
             String thoroughfareName = jh.search(order, "ThoroughfareName").s();
             srcName = fmt("%s %s-", thoroughfareName, premiseNumber);
         } else {
             srcName = "*"+srcName;
         }
+        
         String dstName = jh.path(order, "address_dst/GeoObject/name").s();
         String srcKind = jh.path(order, "address_src/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
         String dstKind = jh.path(order, "address_dst/GeoObject/metaDataProperty/GeocoderMetaData/kind").s();
