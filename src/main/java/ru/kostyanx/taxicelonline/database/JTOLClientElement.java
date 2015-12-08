@@ -9,7 +9,7 @@ import java.io.Writer;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
-import ru.kostyanx.database.JDatabaseAbstract;
+import ru.kostyanx.database.JDatabase;
 import ru.kostyanx.database.JDatabaseRecord2;
 import ru.kostyanx.json.jco;
 import ru.kostyanx.taxicelonline.TaxiInfo;
@@ -20,7 +20,7 @@ import ru.kostyanx.taxicelonline.TaxiInfo;
  */
 public class JTOLClientElement extends JDatabaseRecord2<JTOLClientElement> implements JSONAware, JSONStreamAware {
 
-	public JTOLClientElement(JDatabaseAbstract database) {
+	public JTOLClientElement(JDatabase database) {
 		super(database);
 	}
 

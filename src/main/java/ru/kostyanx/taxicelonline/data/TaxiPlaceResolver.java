@@ -6,7 +6,7 @@ package ru.kostyanx.taxicelonline.data;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import ru.kostyanx.database.JDatabaseAbstract;
+import ru.kostyanx.database.JDatabase;
 import ru.kostyanx.database.JDatabaseException;
 import ru.kostyanx.database.LocalResultSet;
 import org.apache.log4j.Logger;
@@ -32,7 +32,7 @@ public class TaxiPlaceResolver {
     private LinkedList<TaxiDrvPlace> places;
     private LinkedList<TaxiArea> areas;
 
-    public void init(JDatabaseAbstract db) throws JDatabaseException {
+    public void init(JDatabase db) throws JDatabaseException {
         loadPlaces(db);
         loadAreas(db);
     }
@@ -86,7 +86,7 @@ public class TaxiPlaceResolver {
         return p;
     }
 
-    private void loadPlaces(JDatabaseAbstract db) throws JDatabaseException {
+    private void loadPlaces(JDatabase db) throws JDatabaseException {
         places = new LinkedList<>();
         // TODO исправить условие на универсальное
         LocalResultSet pl = db.execute(new JQGetParkings("PLCHANS like '%1%'"));
@@ -100,7 +100,7 @@ public class TaxiPlaceResolver {
         logger.info("places loaded");
     }
 
-    private void loadAreas(JDatabaseAbstract db) throws JDatabaseException {
+    private void loadAreas(JDatabase db) throws JDatabaseException {
         areas = new LinkedList<>();
         // TODO исправить условие на универсальное
         LocalResultSet area = db.execute(new JQGetAreas());

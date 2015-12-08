@@ -4,7 +4,7 @@
  */
 package ru.kostyanx.taxicelonline.database;
 
-import ru.kostyanx.database.JDatabaseAbstract;
+import ru.kostyanx.database.JDatabase;
 import ru.kostyanx.database.JDatabaseRecord2;
 
 /**
@@ -13,7 +13,7 @@ import ru.kostyanx.database.JDatabaseRecord2;
  */
 public class JCarElement extends JDatabaseRecord2<JCarElement> {
 
-	public JCarElement(JDatabaseAbstract database) {
+	public JCarElement(JDatabase database) {
 		super(database);
 	}
 	

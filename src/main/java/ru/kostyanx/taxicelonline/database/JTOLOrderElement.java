@@ -5,7 +5,7 @@
 package ru.kostyanx.taxicelonline.database;
 
 import java.sql.Timestamp;
-import ru.kostyanx.database.JDatabaseAbstract;
+import ru.kostyanx.database.JDatabase;
 import ru.kostyanx.database.JDatabaseRecord2;
 
 /**
@@ -14,7 +14,7 @@ import ru.kostyanx.database.JDatabaseRecord2;
  */
 public class JTOLOrderElement extends JDatabaseRecord2<JTOLOrderElement> {
 
-	public JTOLOrderElement(JDatabaseAbstract database) {
+	public JTOLOrderElement(JDatabase database) {
 		super(database);
 	}
 

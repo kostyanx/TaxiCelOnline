@@ -5,7 +5,7 @@
 package ru.kostyanx.taxicelonline.database;
 
 import java.sql.Timestamp;
-import ru.kostyanx.database.JDatabaseAbstract;
+import ru.kostyanx.database.JDatabase;
 import ru.kostyanx.database.JDatabaseRecord2;
 import ru.kostyanx.utils.K;
 
@@ -15,7 +15,7 @@ import ru.kostyanx.utils.K;
  */
 public class JOrderElement extends JDatabaseRecord2<JOrderElement> {
 
-	public JOrderElement(JDatabaseAbstract database) {
+	public JOrderElement(JDatabase database) {
 		super(database);
 	}
 

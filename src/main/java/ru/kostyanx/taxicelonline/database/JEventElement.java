@@ -5,7 +5,7 @@
 package ru.kostyanx.taxicelonline.database;
 
 import java.sql.Timestamp;
-import ru.kostyanx.database.JDatabaseAbstract;
+import ru.kostyanx.database.JDatabase;
 import ru.kostyanx.database.JDatabaseRecord2;
 
 /**
@@ -14,7 +14,7 @@ import ru.kostyanx.database.JDatabaseRecord2;
  */
 public class JEventElement extends JDatabaseRecord2<JEventElement> {
 
-	public JEventElement(JDatabaseAbstract database) {
+	public JEventElement(JDatabase database) {
 		super(database);
 	}
 
